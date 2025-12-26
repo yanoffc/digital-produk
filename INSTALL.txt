@@ -1,0 +1,47 @@
+================================================================================
+    DIGITAL PAYMENT LANDING PAGE - INSTALLATION GUIDE
+    Version: 1.0
+    For: RifalosID
+================================================================================
+
+QUICK START GUIDE
+================================================================================
+
+1. UPLOAD FILES
+   - Upload semua file ke public_html di cPanel
+   - Pastikan struktur folder benar
+
+2. SET PERMISSIONS
+   - Files: 644
+   - Folders: 755
+   - .htaccess: 644
+
+3. LOGIN ADMIN
+   - URL: https://yourdomain.com/login.html
+   - Username: RifalosID
+   - Password: Rifalos2024!@#Secure
+
+4. SETUP TRIPAY (Optional)
+   - Login sebagai admin
+   - Buka Settings
+   - Masukkan API credentials Tripay
+
+================================================================================
+
+DETAILED INSTRUCTIONS
+================================================================================
+
+See CPANEL_SETUP.md for complete documentation.
+
+================================================================================
+
+SUPPORT
+================================================================================
+
+For issues or questions, check:
+- CPANEL_SETUP.md
+- ADMIN_GUIDE.md
+- README.md
+
+================================================================================
+

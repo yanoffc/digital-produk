@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran - Digital Payment</title>
+    <link rel="stylesheet" href="app.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .payment-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        .payment-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .payment-header h1 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .payment-header p {
+            color: #666;
+        }
+        .product-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        .product-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+        .product-price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #25D366;
+            margin: 1rem 0;
+        }
+        .qr-section {
+            text-align: center;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #fff;
+            border: 2px dashed #e0e0e0;
+            border-radius: 15px;
+        }
+        .qr-section h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .qr-section p {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        #qrCodeImage {
+            max-width: 300px;
+            width: 100%;
+            height: auto;
+            margin: 0 auto;
+            display: block;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            background: #fff;
+        }
+        .payment-info {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin: 1.5rem 0;
+        }
+        .payment-info p {
+            margin: 0.5rem 0;
+            color: #333;
+        }
+        .payment-info strong {
+            color: #25D366;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-expired {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        .loading i {
+            font-size: 3rem;
+            color: #25D366;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .btn-back {
+            background: #6c757d;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-back:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+        .customer-form {
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Poppins', sans-serif;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #25D366;
+            box-shadow: 0 0 0 3px rgba(37,211,102,0.1);
+        }
+        .btn-submit {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 25px;
+            border: none;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+        }
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37,211,102,0.4);
+        }
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="payment-container">
+        <div class="payment-header">
+            <h1><i class="fas fa-qrcode"></i> Pembayaran QRIS</h1>
+            <p>Lakukan pembayaran dengan scan QR Code</p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Memproses pembayaran...</p>
+        </div>
+
+        <!-- Customer Form (if needed) -->
+        <div id="customerForm" class="customer-form" style="display: none;">
+            <h3 style="margin-bottom: 1rem;">Data Customer</h3>
+            <div class="form-group">
+                <label for="customerName"><i class="fas fa-user"></i> Nama Lengkap</label>
+                <input type="text" id="customerName" required>
+            </div>
+            <div class="form-group">
+                <label for="customerEmail"><i class="fas fa-envelope"></i> Email</label>
+                <input type="email" id="customerEmail" required>
+            </div>
+            <div class="form-group">
+                <label for="customerPhone"><i class="fas fa-phone"></i> No. WhatsApp</label>
+                <input type="tel" id="customerPhone" required placeholder="6281234567890">
+            </div>
+            <button class="btn-submit" onclick="processPayment()">
+                <i class="fas fa-arrow-right"></i> Lanjutkan Pembayaran
+            </button>
+        </div>
+
+        <!-- Payment Content -->
+        <div id="paymentContent" style="display: none;">
+            <div class="product-info">
+                <h3 id="productName"></h3>
+                <div class="product-price" id="productPrice"></div>
+            </div>
+
+            <div class="qr-section">
+                <h3><i class="fas fa-qrcode"></i> Scan QR Code untuk Pembayaran</h3>
+                <p>Buka aplikasi e-wallet atau mobile banking Anda, lalu scan QR Code di bawah ini</p>
+                <img id="qrCodeImage" src="" alt="QR Code" style="display: none;">
+            </div>
+
+            <div class="payment-info">
+                <p><strong>Reference:</strong> <span id="paymentReference" style="font-family: monospace;"></span></p>
+                <p><strong>Jumlah:</strong> <span id="paymentAmount"></span></p>
+                <p><strong>Status:</strong> <span id="paymentStatus" class="status-badge status-pending">Menunggu Pembayaran...</span></p>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="index.html" class="btn-back">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script src="tripay.js"></script>
+    <script>
+        let currentProduct = null;
+        let currentTransaction = null;
+
+        // Get product from URL
+        function getProductFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const productId = urlParams.get('product');
+            
+            if (!productId) {
+                alert('Produk tidak ditemukan!');
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            const products = JSON.parse(localStorage.getItem('products') || '[]');
+            const product = products.find(p => p.id == productId);
+            
+            if (!product) {
+                alert('Produk tidak ditemukan!');
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            if (product.stock <= 0) {
+                alert('Maaf, produk ini sedang habis!');
+                window.location.href = 'index.html';
+                return null;
+            }
+
+            return product;
+        }
+
+        // Process payment
+        async function processPayment() {
+            const customer = {
+                name: document.getElementById('customerName').value.trim(),
+                email: document.getElementById('customerEmail').value.trim(),
+                phone: document.getElementById('customerPhone').value.trim()
+            };
+
+            if (!customer.name || !customer.email || !customer.phone) {
+                alert('Mohon lengkapi semua data!');
+                return;
+            }
+
+            // Validate email
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(customer.email)) {
+                alert('Format email tidak valid!');
+                return;
+            }
+
+            // Show loading
+            document.getElementById('customerForm').style.display = 'none';
+            document.getElementById('loadingState').style.display = 'block';
+
+            try {
+                const transaction = await tripay.createTransaction(currentProduct, customer);
+                showPaymentQR(transaction);
+            } catch (error) {
+                alert('Error: ' + error.message);
+                document.getElementById('customerForm').style.display = 'block';
+                document.getElementById('loadingState').style.display = 'none';
+            }
+        }
+
+        // Show payment QR
+        function showPaymentQR(transaction) {
+            currentTransaction = transaction;
+            
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('paymentContent').style.display = 'block';
+
+            // Set product info
+            document.getElementById('productName').textContent = currentProduct.name;
+            document.getElementById('productPrice').textContent = 'Rp ' + formatNumber(currentProduct.price);
+
+            // Set transaction info
+            document.getElementById('paymentReference').textContent = transaction.reference || transaction.merchant_ref;
+            document.getElementById('paymentAmount').textContent = 'Rp ' + formatNumber(transaction.amount);
+
+            // Show QR Code
+            if (transaction.qr_url) {
+                document.getElementById('qrCodeImage').src = transaction.qr_url;
+                document.getElementById('qrCodeImage').style.display = 'block';
+            } else if (transaction.qr_string) {
+                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(transaction.qr_string)}`;
+                document.getElementById('qrCodeImage').src = qrApiUrl;
+                document.getElementById('qrCodeImage').style.display = 'block';
+            }
+
+            // Start checking payment status
+            if (transaction.reference) {
+                checkPaymentStatus(transaction.reference);
+            }
+        }
+
+        // Check payment status
+        let statusCheckInterval = null;
+
+        async function checkPaymentStatus(reference) {
+            const statusEl = document.getElementById('paymentStatus');
+            let checkCount = 0;
+            const maxChecks = 360; // 30 minutes
+
+            if (statusCheckInterval) {
+                clearInterval(statusCheckInterval);
+            }
+
+            statusCheckInterval = setInterval(async () => {
+                try {
+                    checkCount++;
+                    const status = await tripay.checkStatus(reference);
+
+                    // Update status display
+                    if (status.status === 'UNPAID' || status.status === 'PENDING') {
+                        statusEl.textContent = 'Menunggu Pembayaran...';
+                        statusEl.className = 'status-badge status-pending';
+                    } else if (status.status === 'PAID') {
+                        statusEl.textContent = 'Pembayaran Berhasil!';
+                        statusEl.className = 'status-badge status-paid';
+                        
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                        
+                        // Update stock
+                        updateProductStock();
+                        
+                        // Redirect to success page
+                        setTimeout(() => {
+                            window.location.href = 'payment-success.html?ref=' + reference;
+                        }, 2000);
+                    } else if (status.status === 'EXPIRED') {
+                        statusEl.textContent = 'Pembayaran Kedaluwarsa';
+                        statusEl.className = 'status-badge status-expired';
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    } else if (status.status === 'FAILED') {
+                        statusEl.textContent = 'Pembayaran Gagal';
+                        statusEl.className = 'status-badge status-expired';
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                    }
+
+                    if (checkCount >= maxChecks) {
+                        clearInterval(statusCheckInterval);
+                        statusCheckInterval = null;
+                        statusEl.textContent = 'Waktu pembayaran habis';
+                        statusEl.className = 'status-badge status-expired';
+                    }
+                } catch (error) {
+                    console.error('Check status error:', error);
+                }
+            }, 5000);
+        }
+
+        // Update product stock
+        function updateProductStock() {
+            try {
+                const products = JSON.parse(localStorage.getItem('products') || '[]');
+                const productIndex = products.findIndex(p => p.id === currentProduct.id);
+                
+                if (productIndex !== -1 && products[productIndex].stock > 0) {
+                    products[productIndex].stock -= 1;
+                    products[productIndex].updatedAt = new Date().toISOString();
+                    localStorage.setItem('products', JSON.stringify(products));
+                }
+            } catch (error) {
+                console.error('Error updating stock:', error);
+            }
+        }
+
+        // Format number
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            currentProduct = getProductFromURL();
+            
+            if (currentProduct) {
+                // Check if customer data is stored
+                const storedCustomer = localStorage.getItem('lastCustomer');
+                
+                if (storedCustomer) {
+                    try {
+                        const customer = JSON.parse(storedCustomer);
+                        document.getElementById('customerName').value = customer.name || '';
+                        document.getElementById('customerEmail').value = customer.email || '';
+                        document.getElementById('customerPhone').value = customer.phone || '';
+                        
+                        // Auto process if all fields filled
+                        if (customer.name && customer.email && customer.phone) {
+                            processPayment();
+                            return;
+                        }
+                    } catch (e) {
+                        // Ignore
+                    }
+                }
+                
+                // Show customer form
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('customerForm').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>
+

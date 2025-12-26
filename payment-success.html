@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembayaran Berhasil - Digital Payment</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            color: white;
+            font-size: 3rem;
+            animation: scaleIn 0.5s;
+        }
+
+        @keyframes scaleIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 2rem;
+            line-height: 1.8;
+        }
+
+        .btn-home {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-home:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+        <h1>Pembayaran Berhasil!</h1>
+        <p id="successMessage">Terima kasih atas pembelian Anda. Transaksi telah berhasil diproses.</p>
+        <div id="transactionInfo" style="margin: 1.5rem 0; padding: 1rem; background: #f8f9fa; border-radius: 10px; display: none;">
+            <p style="margin-bottom: 0.5rem;"><strong>Reference:</strong> <span id="transactionRef" style="font-family: monospace; color: #25D366;"></span></p>
+            <p><strong>Jumlah:</strong> <span id="transactionAmount" style="color: #25D366; font-weight: 700;"></span></p>
+        </div>
+        <a href="index.html" class="btn-home">
+            <i class="fas fa-home"></i> Kembali ke Beranda
+        </a>
+    </div>
+    <script>
+        // Get transaction reference from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const reference = urlParams.get('ref') || urlParams.get('reference') || urlParams.get('order');
+        
+        if (reference) {
+            // Load transaction data
+            const transactions = JSON.parse(localStorage.getItem('transactions') || '{}');
+            const transaction = Object.values(transactions).find(t => 
+                t.reference === reference || t.merchant_ref === reference
+            );
+            
+            if (transaction) {
+                document.getElementById('transactionRef').textContent = transaction.reference || reference;
+                document.getElementById('transactionAmount').textContent = 'Rp ' + 
+                    transaction.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                document.getElementById('transactionInfo').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
+

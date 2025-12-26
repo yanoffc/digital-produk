@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Kelola Produk</title>
+    <link rel="stylesheet" href="app.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-content">
+                <div class="header-left">
+                    <i class="fas fa-wallet"></i>
+                    <h1>Admin Panel</h1>
+                </div>
+                <div class="header-user" style="display: none;">
+                    <!-- User info hidden for security -->
+                </div>
+                <div class="header-right">
+                    <button class="btn-settings" onclick="openSettings()">
+                        <i class="fas fa-cog"></i> Settings
+                    </button>
+                    <button class="btn-logout" onclick="logout()">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                    <a href="index.html" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Landing Page
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-box"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalProducts">0</h3>
+                        <p>Total Produk</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-cubes"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="totalStock">0</h3>
+                        <p>Total Stok</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3 id="lowStock">0</h3>
+                        <p>Stok Menipis</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Bar -->
+            <div class="action-bar">
+                <button class="btn-add" onclick="openAddModal()">
+                    <i class="fas fa-plus"></i> Tambah Produk Baru
+                </button>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="searchInput" placeholder="Cari produk..." onkeyup="filterProducts()">
+                </div>
+            </div>
+
+            <!-- Products Table -->
+            <div class="table-container">
+                <table class="products-table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Produk</th>
+                            <th>Kategori</th>
+                            <th>Harga</th>
+                            <th>Stok</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productsTableBody">
+                        <tr>
+                            <td colspan="7" class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>Belum ada produk. Klik "Tambah Produk Baru" untuk menambahkan produk.</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Tambah Produk Baru</h2>
+                <button class="modal-close" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="productId">
+                
+                <div class="form-group">
+                    <label for="productName">
+                        <i class="fas fa-tag"></i> Nama Produk <span class="required">*</span>
+                    </label>
+                    <input type="text" id="productName" required placeholder="Contoh: QR Code Payment">
+                </div>
+
+                <div class="form-group">
+                    <label for="productCategory">
+                        <i class="fas fa-folder"></i> Kategori <span class="required">*</span>
+                    </label>
+                    <select id="productCategory" required>
+                        <option value="">Pilih Kategori</option>
+                        <option value="Cloud Hosting">Cloud Hosting</option>
+                        <option value="Digital Ocean">Digital Ocean</option>
+                        <option value="AWS">AWS</option>
+                        <option value="VPS">VPS</option>
+                        <option value="Domain">Domain</option>
+                        <option value="SSL Certificate">SSL Certificate</option>
+                        <option value="QR Code Payment">QR Code Payment</option>
+                        <option value="Payment Link">Payment Link</option>
+                        <option value="E-Commerce">E-Commerce</option>
+                        <option value="Virtual Account">Virtual Account</option>
+                        <option value="Lainnya">Lainnya</option>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="productPrice">
+                            <i class="fas fa-money-bill-wave"></i> Harga <span class="required">*</span>
+                        </label>
+                        <input type="number" id="productPrice" required min="0" placeholder="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productStock">
+                            <i class="fas fa-cubes"></i> Stok <span class="required">*</span>
+                        </label>
+                        <input type="number" id="productStock" required min="0" placeholder="0">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="productDescription">
+                        <i class="fas fa-align-left"></i> Deskripsi
+                    </label>
+                    <textarea id="productDescription" rows="4" placeholder="Deskripsi produk..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="lowStockThreshold">
+                        <i class="fas fa-exclamation-circle"></i> Batas Stok Menipis
+                    </label>
+                    <input type="number" id="lowStockThreshold" min="0" value="10" placeholder="10">
+                    <small>Produk akan ditandai sebagai stok menipis jika jumlah stok di bawah nilai ini</small>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Batal</button>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Simpan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Pengaturan</h2>
+                <button class="modal-close" onclick="closeSettings()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="settingsForm" onsubmit="saveSettings(event)">
+                <div class="form-group">
+                    <label for="whatsappNumber">
+                        <i class="fab fa-whatsapp"></i> Nomor WhatsApp <span class="required">*</span>
+                    </label>
+                    <input type="text" id="whatsappNumber" required placeholder="6281234567890" pattern="[0-9]+">
+                    <small>Format: 62XXXXXXXXXX (tanpa + atau 0 di depan)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="tripayApiKey">
+                        <i class="fas fa-key"></i> Tripay API Key <span class="required">*</span>
+                    </label>
+                    <input type="text" id="tripayApiKey" required placeholder="Masukkan API Key Tripay">
+                    <small>Dapatkan dari dashboard.tripay.co.id</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="tripayPrivateKey">
+                        <i class="fas fa-lock"></i> Tripay Private Key <span class="required">*</span>
+                    </label>
+                    <input type="text" id="tripayPrivateKey" required placeholder="Masukkan Private Key Tripay">
+                </div>
+
+                <div class="form-group">
+                    <label for="tripayMerchantCode">
+                        <i class="fas fa-store"></i> Tripay Merchant Code <span class="required">*</span>
+                    </label>
+                    <input type="text" id="tripayMerchantCode" required placeholder="Masukkan Merchant Code">
+                </div>
+
+                <div class="form-group">
+                    <label for="tripayMode">
+                        <i class="fas fa-toggle-on"></i> Mode Tripay
+                    </label>
+                    <select id="tripayMode">
+                        <option value="sandbox">Sandbox (Testing)</option>
+                        <option value="production">Production (Live)</option>
+                    </select>
+                    <small>Gunakan Sandbox untuk testing, Production untuk live</small>
+                </div>
+
+                <hr style="margin: 2rem 0; border: 1px solid var(--border-color);">
+
+                <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">
+                    <i class="fas fa-webhook"></i> Callback Payment Settings
+                </h3>
+
+                <div class="form-group">
+                    <label for="callbackUrl">
+                        <i class="fas fa-link"></i> Callback URL
+                    </label>
+                    <input type="url" id="callbackUrl" placeholder="https://yourdomain.com/callback.html">
+                    <small>URL untuk menerima callback dari Tripay setelah pembayaran. Kosongkan untuk menggunakan default.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="returnUrl">
+                        <i class="fas fa-undo"></i> Return URL (Success Page)
+                    </label>
+                    <input type="url" id="returnUrl" placeholder="https://yourdomain.com/payment-success.html">
+                    <small>URL untuk redirect customer setelah pembayaran berhasil. Kosongkan untuk menggunakan default.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="callbackSecret">
+                        <i class="fas fa-key"></i> Callback Secret Key
+                    </label>
+                    <input type="text" id="callbackSecret" placeholder="Masukkan secret key untuk verifikasi callback">
+                    <small>Secret key untuk memverifikasi callback dari Tripay (opsional tapi disarankan untuk production)</small>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enableCallback" checked>
+                        <i class="fas fa-check-circle"></i> Aktifkan Callback Verification
+                    </label>
+                    <small>Verifikasi signature callback dari Tripay untuk keamanan</small>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enableCallbackLogging" checked>
+                        <i class="fas fa-file-alt"></i> Aktifkan Callback Logging
+                    </label>
+                    <small>Mencatat semua callback yang diterima untuk debugging</small>
+                </div>
+
+                <hr style="margin: 2rem 0; border: 1px solid var(--border-color);">
+
+                <h3 style="margin-bottom: 1.5rem; color: var(--text-dark);">
+                    <i class="fas fa-shield-check"></i> Integritas Pembayaran
+                </h3>
+
+                <div class="form-group">
+                    <label for="paymentVerification">
+                        <i class="fas fa-check-double"></i> Verifikasi Pembayaran Otomatis
+                    </label>
+                    <select id="paymentVerification">
+                        <option value="auto">Otomatis (Real-time)</option>
+                        <option value="manual">Manual (Konfirmasi Admin)</option>
+                        <option value="hybrid">Hybrid (Auto + Manual Review)</option>
+                    </select>
+                    <small>Pilih metode verifikasi pembayaran. Otomatis akan langsung approve, Manual perlu konfirmasi admin.</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentTimeout">
+                        <i class="fas fa-clock"></i> Timeout Pembayaran (menit)
+                    </label>
+                    <input type="number" id="paymentTimeout" min="5" max="1440" value="30" placeholder="30">
+                    <small>Waktu maksimal untuk menyelesaikan pembayaran sebelum transaksi expired</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="autoRefund">
+                        <i class="fas fa-undo"></i> Auto Refund untuk Transaksi Gagal
+                    </label>
+                    <select id="autoRefund">
+                        <option value="enabled">Aktif</option>
+                        <option value="disabled">Nonaktif</option>
+                    </select>
+                    <small>Otomatis refund jika pembayaran gagal atau expired</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentWebhook">
+                        <i class="fas fa-webhook"></i> Webhook URL untuk Notifikasi
+                    </label>
+                    <input type="url" id="paymentWebhook" placeholder="https://yourdomain.com/webhook/payment">
+                    <small>URL untuk menerima notifikasi status pembayaran dari Tripay</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="paymentSecret">
+                        <i class="fas fa-key"></i> Webhook Secret Key
+                    </label>
+                    <input type="text" id="paymentSecret" placeholder="Masukkan secret key untuk verifikasi webhook">
+                    <small>Secret key untuk memverifikasi webhook dari Tripay (opsional tapi disarankan)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="minPaymentAmount">
+                        <i class="fas fa-money-bill-wave"></i> Minimum Amount Pembayaran
+                    </label>
+                    <input type="number" id="minPaymentAmount" min="0" value="10000" placeholder="10000">
+                    <small>Jumlah minimum untuk transaksi pembayaran (dalam Rupiah)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="maxPaymentAmount">
+                        <i class="fas fa-money-bill-wave"></i> Maximum Amount Pembayaran
+                    </label>
+                    <input type="number" id="maxPaymentAmount" min="0" value="100000000" placeholder="100000000">
+                    <small>Jumlah maksimum untuk transaksi pembayaran (dalam Rupiah)</small>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enablePaymentLogging" checked>
+                        <i class="fas fa-file-alt"></i> Aktifkan Payment Logging
+                    </label>
+                    <small>Mencatat semua transaksi pembayaran untuk audit dan troubleshooting</small>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="enableEmailNotification" checked>
+                        <i class="fas fa-envelope"></i> Notifikasi Email untuk Pembayaran
+                    </label>
+                    <small>Kirim email notifikasi saat ada pembayaran baru atau berhasil</small>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeSettings()">Batal</button>
+                    <button type="submit" class="btn-save">
+                        <i class="fas fa-save"></i> Simpan Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Hapus Produk</h2>
+                <button class="modal-close" onclick="closeDeleteModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="delete-content">
+                <i class="fas fa-exclamation-triangle"></i>
+                <p>Apakah Anda yakin ingin menghapus produk <strong id="deleteProductName"></strong>?</p>
+                <p class="warning-text">Tindakan ini tidak dapat dibatalkan!</p>
+            </div>
+            <div class="modal-actions">
+                <button type="button" class="btn-cancel" onclick="closeDeleteModal()">Batal</button>
+                <button type="button" class="btn-delete" onclick="confirmDelete()">
+                    <i class="fas fa-trash"></i> Hapus
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.min.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
+

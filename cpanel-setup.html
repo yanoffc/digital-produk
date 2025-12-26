@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup cPanel - Digital Payment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-left: 4px solid #25D366;
+        }
+        
+        .step h2 {
+            color: #25D366;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .step ol, .step ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .step li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+        
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .success {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: #25D366;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4);
+        }
+        
+        .btn-center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 Setup cPanel Hosting</h1>
+        <p class="subtitle">Panduan lengkap untuk mengupload website ke cPanel</p>
+        
+        <div class="step">
+            <h2>📁 Langkah 1: Upload File ke cPanel</h2>
+            <ol>
+                <li>Login ke cPanel hosting Anda</li>
+                <li>Buka <strong>File Manager</strong></li>
+                <li>Masuk ke folder <code>public_html</code> (atau <code>www</code>)</li>
+                <li>Upload semua file website ke folder tersebut:
+                    <ul>
+                        <li>index.html</li>
+                        <li>login.html</li>
+                        <li>admin.html</li>
+                        <li>Semua file .css, .js</li>
+                        <li>File .htaccess</li>
+                    </ul>
+                </li>
+                <li>Pastikan struktur folder seperti ini:
+                    <div class="code">public_html/
+├── index.html
+├── login.html
+├── admin.html
+├── style.css
+├── script.js
+├── auth.js
+├── security.js
+├── admin.js
+├── admin.css
+├── tripay.js
+├── payment.js
+├── .htaccess
+└── ... (file lainnya)</div>
+                </li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h2>🔐 Langkah 2: Set Permissions File</h2>
+            <ol>
+                <li>Di File Manager, pilih semua file</li>
+                <li>Klik kanan → <strong>Change Permissions</strong></li>
+                <li>Set permissions:
+                    <ul>
+                        <li><strong>Files</strong>: 644</li>
+                        <li><strong>Folders</strong>: 755</li>
+                    </ul>
+                </li>
+                <li>Untuk file .htaccess, set permission: <strong>644</strong></li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h2>🌐 Langkah 3: Konfigurasi Domain</h2>
+            <ol>
+                <li>Pastikan domain sudah terhubung ke cPanel</li>
+                <li>Jika menggunakan subdomain, buat di cPanel → <strong>Subdomains</strong></li>
+                <li>Pastikan document root mengarah ke <code>public_html</code></li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h2>🔒 Langkah 4: Setup SSL (HTTPS)</h2>
+            <ol>
+                <li>Di cPanel, buka <strong>SSL/TLS</strong></li>
+                <li>Install SSL certificate (Let's Encrypt gratis tersedia)</li>
+                <li>Setelah SSL aktif, uncomment baris HTTPS di .htaccess:
+                    <div class="code"># Uncomment these lines in .htaccess:
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]</div>
+                </li>
+            </ol>
+        </div>
+        
+        <div class="step">
+            <h2>👤 Langkah 5: Login Admin</h2>
+            <ol>
+                <li>Buka website Anda: <code>https://yourdomain.com</code></li>
+                <li>Klik menu <strong>"Admin"</strong> atau buka: <code>https://yourdomain.com/login.html</code></li>
+                <li>Login dengan kredensial:
+                    <div class="code">Username: RifalosID
+Password: Rifalos2024!@#Secure</div>
+                </li>
+                <li>Setelah login, Anda akan diarahkan ke Admin Panel</li>
+            </ol>
+        </div>
+        
+        <div class="warning">
+            <strong>⚠️ PENTING:</strong>
+            <ul>
+                <li>Ganti password default setelah pertama kali login</li>
+                <li>Jangan share kredensial admin ke siapapun</li>
+                <li>Backup file secara berkala</li>
+                <li>Pastikan file .htaccess sudah terupload</li>
+            </ul>
+        </div>
+        
+        <div class="success">
+            <strong>✅ Checklist Setup:</strong>
+            <ul>
+                <li>✓ Semua file sudah terupload</li>
+                <li>✓ Permissions sudah diset dengan benar</li>
+                <li>✓ Domain sudah terhubung</li>
+                <li>✓ SSL sudah diaktifkan (disarankan)</li>
+                <li>✓ Bisa login sebagai admin</li>
+            </ul>
+        </div>
+        
+        <div class="btn-center">
+            <a href="login.html" class="btn">🔐 Login Admin</a>
+            <a href="index.html" class="btn" style="background: #667eea; margin-left: 10px;">🏠 Landing Page</a>
+        </div>
+    </div>
+</body>
+</html>
+
